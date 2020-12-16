@@ -51,10 +51,9 @@ namespace Tetris
 						};
 						cells[y, x] = null;
 					}
-			;
 		}
 
-		public void Add(Cell cell) => cells[cell.X, cell.Y] = cell;
+		public void Add(Cell cell) => cells[cell.Y, cell.X] = cell;
 
 		public IEnumerable<Cell> GetCells()
 		{
