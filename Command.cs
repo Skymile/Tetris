@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace WpfTetris
+namespace Tetris
 {
 	public class Command : ICommand
 	{

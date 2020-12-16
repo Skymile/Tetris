@@ -1,6 +1,6 @@
 ﻿using System.Windows.Media;
 
-namespace WpfTetris
+namespace Tetris
 {
 	public class Cell
 	{
