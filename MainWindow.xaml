@@ -5,11 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Tetris"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        ResizeMode="NoResize"
+        KeyDown="Window_KeyDown"
+        Title="MainWindow" Height="900" Width="900">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="240"/>
         </Grid.ColumnDefinitions>
 
         <Grid Name="MainGrid"/>
@@ -18,7 +20,30 @@
         <StackPanel Grid.Column="1">
             <Button Content="Add Score" Command="{Binding AddScore}"/>
             <Button Content="Sub Score" Command="{Binding SubScore}"/>
-            <Button Content="Test" Click="Button_Click"/>
+
+            <Button Content="Load"  Command="{Binding Load }"/>
+            <Button Content="Save"  Command="{Binding Save }"/>
+            <Button Content="Pause" Command="{Binding Pause}"/>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Content="Left"  Command="{Binding MoveLeft}" />
+                <Button Grid.Column="1" Content="Down"  Command="{Binding MoveDown}" />
+                <Button Grid.Column="2" Content="Right" Command="{Binding MoveRight}"/>
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="Rotate Left"  Command="{Binding RotateLeft}"/>
+                <Button Grid.Column="1" Content="Rotate Right" Command="{Binding RotateRight}"/>
+            </Grid>
         </StackPanel>
     </Grid>
 </Window>
