@@ -1,7 +1,18 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Tetris
 {
+	// View ViewModel Model Support
+
+	// MainWindow
+	//  MainWindowView
+	//  MainWindowVM
+	// GameWindow
+	// Model
+
+
+
 	// MVC  Model View Controller
 	// Model, View
 	// Controller - Kontroluje przebieg aplikacji
@@ -33,10 +44,20 @@ namespace Tetris
 
 		public void Fall()
 		{
+			var hashX = Current.Select(i => i.X).ToHashSet();
+			var hashY = Current.Select(i => i.Y).ToHashSet();
+
 			for (int y = Config.GridHeight - 2; y >= 0; y--)
 				for (int x = 0; x < Config.GridWidth; x++)
-					if (cells[y + 1, x] == null && cells[y, x] != null)
+					if (
+						hashX.Contains(x) &&
+						hashY.Contains(y) &&
+						cells[y + 1, x] == null &&
+						cells[y, x] != null
+						)
+					{
 						Move(cells[y, x], 0, 1);
+					}
 		}
 
 		private void Move(Cell f, int x, int y)
@@ -48,6 +69,13 @@ namespace Tetris
 				Background = f.Background
 			};
 			cells[f.Y, f.X] = null;
+
+			foreach (var cell in Current)
+				if (cell.X == f.X && cell.Y == f.Y)
+				{
+					cell.Y += y;
+					cell.X += x;
+				}
 		}
 
 		public void Reset()
@@ -91,6 +119,12 @@ namespace Tetris
 						{
 							Move(cells[y, x], -1, 0);
 						}
+		}
+
+		public void Add(Block block)
+		{
+			block.Cells.ForEach(Add);
+			Current = block;
 		}
 
 		public void Add(Cell cell) => cells[cell.Y, cell.X] = cell;
