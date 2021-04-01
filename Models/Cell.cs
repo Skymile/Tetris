@@ -8,7 +8,8 @@ namespace Tetris
 	{
 		public int X { get; set; }
 		public int Y { get; set; }
+		public bool IsBlock { get; set; }
 
-		public Brush Background { get; set; } = Config.NonEmptyCellBg;
+		public Brush Background { get; set; } = Config.Current.NonEmptyCellBg;
 	}
 }

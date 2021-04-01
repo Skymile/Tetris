@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Tetris
@@ -38,17 +40,27 @@ namespace Tetris
 	//   Grid       - Odpowiedzialna za kontrole Cells, opadanie
 	//   Randomizer - Odpowiedzialna za losowanie koloru, losowanie klocka
 
-	public class CellGrid
+	public class CellGrid : IEnumerable<Cell>
 	{
 		public Block Current { get; set; }
 
 		public void Fall()
 		{
+			if (Current is null)
+				return;
+
 			var hashX = Current.Select(i => i.X).ToHashSet();
 			var hashY = Current.Select(i => i.Y).ToHashSet();
 
-			for (int y = Config.GridHeight - 2; y >= 0; y--)
-				for (int x = 0; x < Config.GridWidth; x++)
+			if (hashY.Contains(Config.Current.GridHeight - 1))
+			{
+				foreach (var i in Current)
+					i.IsBlock = false;
+				Current = null;
+			}
+
+			for (int y = Config.Current.GridHeight - 2; y >= 0; y--)
+				for (int x = 0; x < Config.Current.GridWidth; x++)
 					if (
 						hashX.Contains(x) &&
 						hashY.Contains(y) &&
@@ -58,10 +70,14 @@ namespace Tetris
 					{
 						Move(cells[y, x], 0, 1);
 					}
+
 		}
 
 		private void Move(Cell f, int x, int y)
 		{
+			if (Current is null)
+				return;
+
 			cells[f.Y + y, f.X + x] = new Cell
 			{
 				X = f.X + x,
@@ -80,23 +96,30 @@ namespace Tetris
 
 		public void Reset()
 		{
-			for (int y = 0; y < Config.GridHeight; y++)
-				for (int x = 0; x < Config.GridWidth; x++)
+			Current = null;
+			for (int y = 0; y < Config.Current.GridHeight; y++)
+				for (int x = 0; x < Config.Current.GridWidth; x++)
 					cells[y, x] = null;
 		}
 
 		public void MoveRight()
 		{
-			bool can = true;
-			for (int y = Config.GridHeight - 1; y >= 0; y--)
-				for (int x = Config.GridWidth - 1; x >= 0; x--)
+			HashSet<int> setX = Current.Select(i => i.X).ToHashSet();
+			HashSet<int> setY = Current.Select(i => i.Y).ToHashSet();
+
+			bool can = !setX.Contains(Config.Current.GridWidth - 1);
+			for (int y = Config.Current.GridHeight - 1; y >= 0; y--)
+				for (int x = Config.Current.GridWidth - 1; x >= 0; x--)
 					if (cells[y, x] != null)
-						if (x >= Config.GridWidth - 1 || cells[y, x + 1] != null)
-							can = false;
+						if (x >= Config.Current.GridWidth - 1 || cells[y, x + 1] != null)
+						{
+							if (!setX.Contains(x) && !setY.Contains(y))
+								can = false;
+						}
 
 			if (can)
-				for (int y = Config.GridHeight - 1; y >= 0; y--)
-					for (int x = Config.GridWidth - 2; x >= 0; x--)
+				for (int y = Config.Current.GridHeight - 1; y >= 0; y--)
+					for (int x = Config.Current.GridWidth - 2; x >= 0; x--)
 						if (cells[y, x] != null && cells[y, x + 1] == null)
 						{
 							Move(cells[y, x], 1, 0);
@@ -105,38 +128,66 @@ namespace Tetris
 
 		public void MoveLeft()
 		{
-			bool can = true;
-			for (int y = Config.GridHeight - 1; y >= 0; y--)
-				for (int x = 0; x < Config.GridWidth; x++)
+			HashSet<int> setX = Current.Select(i => i.X).ToHashSet();
+			HashSet<int> setY = Current.Select(i => i.Y).ToHashSet();
+
+			bool can = !setX.Contains(0);
+			for (int y = Config.Current.GridHeight - 1; y >= 0; y--)
+				for (int x = 0; x < Config.Current.GridWidth; x++)
 					if (cells[y, x] != null)
 						if (x <= 0 || cells[y, x - 1] != null)
-							can = false;
+						{
+							if (!setX.Contains(x) && !setY.Contains(y))
+								can = false;
+						}
 
 			if (can)
-				for (int y = Config.GridHeight - 1; y >= 0; y--)
-					for (int x = 1; x < Config.GridWidth; x++)
+				for (int y = Config.Current.GridHeight - 1; y >= 0; y--)
+					for (int x = 1; x < Config.Current.GridWidth; x++)
 						if (cells[y, x] != null && cells[y, x - 1] == null)
 						{
 							Move(cells[y, x], -1, 0);
 						}
 		}
 
+		public void RotateRight() => Rotate(() => Current.RotateRight());
+		public void RotateLeft () => Rotate(() => Current.RotateLeft ());
+
+		private void Rotate(Func<Block> rotated)
+		{
+			var old = Current.ToList();
+			foreach (Cell i in Current)
+				cells[i.Y, i.X] = null;
+			rotated();
+			// Sprawdzanie czy jest miejsce
+			// Current = old;
+			foreach (Cell i in Current)
+				cells[i.Y, i.X] = i;
+		}
+
 		public void Add(Block block)
 		{
+			foreach (var i in block)
+				i.IsBlock = true;
 			block.Cells.ForEach(Add);
 			Current = block;
+
+			cells[9, 10] = new Cell() { X = 9, Y = 10 };
 		}
 
 		public void Add(Cell cell) => cells[cell.Y, cell.X] = cell;
 
 		public IEnumerable<Cell> GetCells()
 		{
-			for (int y = 0; y < Config.GridHeight; y++)
-				for (int x = 0; x < Config.GridWidth; x++)
+			for (int y = 0; y < Config.Current.GridHeight; y++)
+				for (int x = 0; x < Config.Current.GridWidth; x++)
 					if (cells[y, x] != null)
 						yield return cells[y, x];
 		}
 
-		private readonly Cell[,] cells = new Cell[Config.GridHeight, Config.GridWidth];
+		public IEnumerator<Cell> GetEnumerator() => (IEnumerator<Cell>)cells.GetEnumerator();
+		IEnumerator IEnumerable.GetEnumerator()  => cells.GetEnumerator();
+
+		private readonly Cell[,] cells = new Cell[Config.Current.GridHeight, Config.Current.GridWidth];
 	}
 }

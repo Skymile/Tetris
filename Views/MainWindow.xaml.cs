@@ -23,6 +23,14 @@ namespace Tetris
 		{
 			switch (e.Key)
 			{
+				case Key.Left:
+					vm.RotateLeft();
+					vm.Refresh();
+					break;
+				case Key.Right:
+					vm.RotateRight();
+					vm.Refresh();
+					break;
 				case Key.R:
 					vm.Reset();
 					break;

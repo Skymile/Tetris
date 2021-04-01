@@ -2,21 +2,19 @@
 
 namespace Tetris
 {
-	public static class Config
+	public class Config
 	{
-		public const int GridWidth = 15;
-		public const int GridHeight = 20;
+		public static Config Current = new Config();
 
-		public const int ScoreTick = 100;
+		public readonly Brush EmptyCellBg = Brushes.LightGray;
+		public readonly Brush NonEmptyCellBg = Brushes.Black;
 
-		public static readonly Brush EmptyCellBg = Brushes.LightGray;
-		public static readonly Brush NonEmptyCellBg = Brushes.Black;
-
-		public const int CellWidth = 40;
-		public const int CellHeight = 40;
-
-		public const int GridMargin = 2;
-
-		public const int InitialScore = 400;
+		public int GridWidth { get; set; } = 15;
+		public int GridHeight { get; set; } = 20;
+		public int ScoreTick { get; set; } = 100;
+		public int CellWidth { get; set; } = 40;
+		public int CellHeight { get; set; } = 40;
+		public int GridMargin { get; set; } = 2;
+		public int InitialScore { get; set; } = 400;
 	}
 }
