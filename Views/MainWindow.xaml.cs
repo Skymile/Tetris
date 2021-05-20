@@ -1,8 +1,5 @@
-﻿using System.ComponentModel;
-using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace Tetris
 {
@@ -15,8 +12,6 @@ namespace Tetris
 		{
 			InitializeComponent();
 			this.DataContext = vm = new MainWindowVM(MainGrid);
-			//((MainWindowVM)this.DataContext).Reset();
-			//(this.DataContext as MainWindowVM)?.Reset();
 		}
 
 		private void Window_KeyDown(object sender, KeyEventArgs e)

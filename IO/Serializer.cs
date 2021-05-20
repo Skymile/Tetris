@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Tetris.IO
@@ -44,7 +45,30 @@ namespace Tetris.IO
 
 		public static T Deserialize<T>(string text)
 		{
+			string[] lines = text.Split(Environment.NewLine);
 
+			Type type = typeof(T);
+			string name = type.Name;
+
+			string header = lines[0];
+			if (header.StartsWith('[') &&
+				header.EndsWith(']') &&
+				header.Trim('[', ']').Split().First() == name)
+			{
+				T item = Activator.CreateInstance<T>();
+
+				var propValues = lines
+					.Skip(1)
+					.Select(i => i.Split('='))
+					.ToDictionary(i => i[0], i => i[1]);
+
+				foreach (PropertyInfo prop in type.GetProperties())
+					if (propValues.TryGetValue(prop.Name, out string value))
+					{
+						prop.SetValue(item, Convert.ChangeType(value, prop.PropertyType));
+					}
+			}
+			else throw new InvalidCastException(name);
 
 			return default;
 		}
